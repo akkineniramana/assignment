@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+    parameters {
+                  choice choices: ['create', 'destroy'], description: 'choose option to perform action', name: 'ACTION'
+                }
+    stages {
+       stage('Git Checkout') {
+            steps {
+                git branch: 'main', credentialsId: 'f46b8c18-d7fb-4549-97b1-fd2630cbb3d6', url: 'https://github.com/akkineniramana/assignment.git'
+            }
+        }
+        
+         
+         stage('Terraform plan') {
+             when {
+                expression { 
+                   return params.ACTION == 'create'
+                }
+            }
+            steps {
+                 dir('terraform') {
+                    print '########### creating EKS  cluster #########'
+                    sh 'terraform init'
+                    sh 'terraform plan'
+                    sh 'terraform apply --auto-approve'
+                }
+              
+            }
+        }
+          stage('Terraform DESTROY') {
+            when {
+                expression { 
+                   return params.ACTION == 'destroy'
+                }
+            }
+            steps {
+                dir('terraform') {
+                    print '###########   destroying eks   cluster #########'
+                    sh 'terraform destroy --auto-approve'
+                }
+            }
+        }
+    }
+}

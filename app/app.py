@@ -9,10 +9,10 @@ app = Flask(__name__)
 
 
 def get_user() -> List[Dict]:
-    password =  os.getenv("database_password") or "root"
-    host = os.getenv("database_name") or "mysql"
-    database = os.getenv("MYSQL_SERVICE_HOST") or "api"
-    port = os.getenv("MYSQL_SERVICE_PORT") or '3306'
+    password =  os.getenv("DB_PASSWORD") or "root"
+    host = os.getenv("DB_HOSTNAME") or "mysql"
+    database = os.getenv("DB_NAME") or "api"
+    port = os.getenv("DB_PORT") or '3306'
     config = {
         'user': 'root',
         'password': password,
@@ -23,17 +23,17 @@ def get_user() -> List[Dict]:
     print("config ", config)
     connection = mysql.connector.connect(**config)
     cursor = connection.cursor()
-    cursor.execute('SELECT * FROM users')
-    results = [{"user": name} for name in cursor]
+    cursor.execute('SELECT * FROM users LIMIT 1')
+    results = [name for name in cursor]
     cursor.close()
     connection.close()
 
-    return results
+    return results[0]
 
 
 @app.route('/')
 def index() -> str:
-    return json.dumps({'user': get_user()})
+    return "hello user : {}".format(get_user())
 
 
 if __name__ == '__main__':

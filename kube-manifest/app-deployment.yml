@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: helloworld-api
-          image: akkineniramana/helloworld-api:1.0
+          image: akkineniramana/helloworld-api:latest
           ports: 
             - containerPort: 5000           
           env:
